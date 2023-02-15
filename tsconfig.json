@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "importHelpers": true,
+    "module": "CommonJS",
+    "outDir": "build",
+    "target": "ESNext"
+  },
+  "exclude": ["node_modules", "build"],
+  "include": ["src"]
+}
