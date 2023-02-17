@@ -1,6 +1,6 @@
 {
   "name": "axios-token-handler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatically refreshes access tokens for axios requests",
   "keywords": [
     "axios",
