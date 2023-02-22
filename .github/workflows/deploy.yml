@@ -28,12 +28,14 @@ jobs:
           tag: next
       - if: ${{ github.event_name == 'push' }}
         uses: actions/github-script@v5
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const child_process = require('child_process');
             const { name, version } = require('./package.json');
-            child_process.exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
+
+            child_process.exec(`npm set //registry.npmjs.org/:_authToken ${process.env.NPM_TOKEN}`, (error, stdout, stderr) => {
               if (error) {
                 console.log(`error: ${error.message}`);
                 return;
@@ -42,5 +44,15 @@ jobs:
                 console.log(`stderr: ${stderr}`);
                 return;
               }
-              console.log(`stdout: ${stdout}`);
+              child_process.exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
+                if (error) {
+                  console.log(`error: ${error.message}`);
+                  return;
+                }
+                if (stderr) {
+                  console.log(`stderr: ${stderr}`);
+                  return;
+                }
+                console.log(`stdout: ${stdout}`);
+              });
             });
