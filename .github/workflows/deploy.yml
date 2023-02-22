@@ -25,7 +25,21 @@ jobs:
           registry: https://registry.npmjs.org/
           tag: next
       - if: ${{ github.event_name == 'push' }}
-        uses: mikeal/merge-release@master
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+        uses: actions/github-script@v5
+#        run npm dist-tag add
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { exec } = require('child_process');
+            const { name, version } = require('./package.json');
+            exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
+              if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+              }
+              if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+              }
+              console.log(`stdout: ${stdout}`);
+            });
