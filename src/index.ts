@@ -92,9 +92,11 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   private async updateToken(error?: AxiosError) {
     const token = this.getToken();
     try {
-      const { data: newToken } = await this.axios.post<TokenResponse<AT, RT, ATEI>>(this.options.refreshTokenUrl, {
-        [this.options.refreshTokenKey]: token[this.options.refreshTokenKey],
-      });
+      const { data: newToken } = await this.axios.post<TokenResponse<AT, RT, ATEI>>(
+        this.options.refreshTokenUrl,
+        { [this.options.refreshTokenKey]: token[this.options.refreshTokenKey] },
+        { headers: { Authorization: `Bearer ${token[this.options.accessTokenKey]}` } }
+      );
       this.setToken(newToken);
       Object.assign(token, newToken);
       if (error) {
