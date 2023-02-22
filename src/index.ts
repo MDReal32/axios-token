@@ -44,6 +44,10 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
     this.token = null;
   }
 
+  async refreshToken() {
+    await this.updateToken();
+  }
+
   private handle() {
     this.axios.interceptors.request.use(async (config) => {
       const token = this.getToken();
@@ -58,9 +62,8 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
         config.headers.Authorization = `Bearer ${token[this.options.accessTokenKey]}`;
       } else {
         try {
-          const newToken = await this.updateToken();
-          this.setToken(newToken);
-          Object.assign(token, newToken);
+          await this.updateToken();
+          Object.assign(token, this.getToken());
           config.headers.Authorization = `Bearer ${token[this.options.accessTokenKey]}`;
         } catch (error) {
           this.options.onError(error);
@@ -76,7 +79,7 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
       },
       async (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
-          await this.updateToken(error);
+          await this.refreshToken();
         }
         return Promise.reject(error);
       }
