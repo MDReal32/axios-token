@@ -16,6 +16,7 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
     this.handle();
   }
 
+
   getToken(): TokenResponse<AT, RT, ATEI> | null;
   getToken<Key extends AT | RT | ATEI>(key: Key): TokenResponse<AT, RT, ATEI>[Key] | null;
   getToken(key?: AT | RT | ATEI) {
