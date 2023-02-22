@@ -19,15 +19,13 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   getToken(): TokenResponse<AT, RT, ATEI> | null;
   getToken<Key extends AT | RT | ATEI>(key: Key): TokenResponse<AT, RT, ATEI>[Key] | null;
   getToken(key?: AT | RT | ATEI) {
-    if (typeof window !== "undefined") {
-      const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
-      if (key) {
-        if (key in token) return token[key];
-        throw new Error(`Token key ${key} not found`);
-      }
-      return token;
+    if (typeof window === "undefined") return this.token;
+    const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
+    if (key) {
+      if (token && key in token) return token[key];
+      throw new Error(`Token key ${key} not found`);
     }
-    return this.token;
+    return token;
   }
 
   setToken(token: TokenResponse<AT, RT, ATEI>) {
