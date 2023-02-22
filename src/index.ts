@@ -23,7 +23,7 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
     const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
     if (key) {
       if (token && key in token) return token[key];
-      throw new Error(`Token key ${key} not found`);
+      return null;
     }
     return token;
   }
