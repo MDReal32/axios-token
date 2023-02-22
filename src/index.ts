@@ -16,7 +16,6 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
     this.handle();
   }
 
-
   getToken(): TokenResponse<AT, RT, ATEI> | null;
   getToken<Key extends AT | RT | ATEI>(key: Key): TokenResponse<AT, RT, ATEI>[Key] | null;
   getToken(key?: AT | RT | ATEI) {
@@ -36,6 +35,13 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
       this.options.storage?.setItem(this.options.storageKey, JSON.stringify(token));
     }
     this.token = token;
+  }
+
+  clearToken() {
+    if (typeof window !== "undefined") {
+      this.options.storage?.removeItem(this.options.storageKey);
+    }
+    this.token = null;
   }
 
   private handle() {
