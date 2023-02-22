@@ -16,8 +16,10 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-      - run: yarn
-      - run: yarn build
+      - if: ${{ github.event_name == 'pull_request' }}
+        run: yarn
+      - if: ${{ github.event_name == 'pull_request' }}
+        run: yarn build
       - if: ${{ github.event_name == 'pull_request' }}
         uses: JS-DevTools/npm-publish@v1
         with:
@@ -26,11 +28,9 @@ jobs:
           tag: next
       - if: ${{ github.event_name == 'push' }}
         uses: actions/github-script@v5
-#        run npm dist-tag add
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { exec } = require('child_process');
             const { name, version } = require('./package.json');
             exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
               if (error) {
