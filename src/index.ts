@@ -8,7 +8,7 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   private token: TokenResponse<AT, RT, ATEI> | null = null;
   private tokenKey = "axios-token";
 
-  constructor(private axios: AxiosInstance, private options: AxiosTokenOptions<AT, RT, ATEI>) {
+  constructor(private axios: AxiosInstance, private options: AxiosTokenOptions<AT, RT, ATEI> = {}) {
     if (typeof window !== "undefined") {
       this.options.storage ||= sessionStorage;
       this.options.storageKey ||= this.tokenKey;
@@ -16,9 +16,13 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
     this.handle();
   }
 
-  getToken(): TokenResponse<AT, RT, ATEI> | null {
+  getToken(): TokenResponse<AT, RT, ATEI> | null;
+  getToken<Key extends AT | RT | ATEI>(key: Key): TokenResponse<AT, RT, ATEI>[Key] | null;
+  getToken(key?: AT | RT | ATEI) {
     if (typeof window !== "undefined") {
-      return this.options.storage?.getItem(this.options.storageKey) as TokenResponse<AT, RT, ATEI>;
+      const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
+      if (key) return token[key];
+      return token;
     }
     return this.token;
   }
@@ -95,7 +99,11 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   }
 }
 
-export const axiosToken = <AT extends string, RT extends string, ATEI extends string>(
+export const axiosToken = <
+  AT extends string = "accessToken",
+  RT extends string = "refreshToken",
+  ATEI extends string = "accessTokenExpiresIn"
+>(
   axios: AxiosInstance,
-  options: AxiosTokenOptions<AT, RT, ATEI>
+  options?: AxiosTokenOptions<AT, RT, ATEI>
 ) => new AxiosToken(axios, options);

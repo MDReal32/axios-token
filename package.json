@@ -1,6 +1,6 @@
 {
   "name": "axios-token-handler",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Automatically refreshes access tokens for axios requests",
   "keywords": [
     "axios",
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MDReal32/axios-token-handler.git"
+    "url": "git+https://github.com/MDReal32/axios-token.git"
   },
   "license": "ISC",
   "author": "MDReal <mdrealiyev00@gmail.com>",
