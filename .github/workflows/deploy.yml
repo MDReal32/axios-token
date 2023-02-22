@@ -31,8 +31,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const child_process = require('child_process');
             const { name, version } = require('./package.json');
-            exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
+            child_process.exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
               if (error) {
                 console.log(`error: ${error.message}`);
                 return;
