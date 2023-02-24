@@ -32,10 +32,9 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
+            npm version prerelease --preid next --no-git-tag-version
             npm publish --access public --tag next
           elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/master" ]; then
-            # read the name of the package from package.json
-            PACKAGE_NAME=$(node -p "require('./package.json').name")
-            npm unpublish "$PACKAGE_NAME@next" --force
+            npm version patch --no-git-tag-version
             npm publish --tag latest
           fi
