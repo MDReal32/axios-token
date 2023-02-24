@@ -1,58 +1,37 @@
-name: Deploy to npm
+name: Publish to npm
 
 on:
-  push:
+  pull_request:
     branches:
       - master
-  pull_request:
+  push:
     branches:
       - master
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
         with:
-          node-version: 16
-      - if: ${{ github.event_name == 'pull_request' }}
-        run: yarn
-      - if: ${{ github.event_name == 'pull_request' }}
-        run: yarn build
-      - if: ${{ github.event_name == 'pull_request' }}
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          registry: https://registry.npmjs.org/
-          tag: next
-      - if: ${{ github.event_name == 'push' }}
-        uses: actions/github-script@v5
+          node-version: '14.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to npm with next tag
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        with:
-          script: |
-            const child_process = require('child_process');
-            const { name, version } = require('./package.json');
-
-            child_process.exec(`npm set //registry.npmjs.org/:_authToken ${process.env.NPM_TOKEN}`, (error, stdout, stderr) => {
-              if (error) {
-                console.log(`error: ${error.message}`);
-                return;
-              }
-              if (stderr) {
-                console.log(`stderr: ${stderr}`);
-                return;
-              }
-              child_process.exec(`npm dist-tag add ${name}@${version} latest`, (error, stdout, stderr) => {
-                if (error) {
-                  console.log(`error: ${error.message}`);
-                  return;
-                }
-                if (stderr) {
-                  console.log(`stderr: ${stderr}`);
-                  return;
-                }
-                console.log(`stdout: ${stdout}`);
-              });
-            });
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            npm version prerelease --preid=next
+            npm publish --tag next
+          elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            npm version patch
+            npm publish --tag latest
+          fi
