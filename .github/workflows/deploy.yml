@@ -34,6 +34,8 @@ jobs:
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             npm publish --access public --tag next
           elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/master" ]; then
-            npm version patch
+            # read the name of the package from package.json
+            PACKAGE_NAME=$(node -p "require('./package.json').name")
+            npm unpublish "$PACKAGE_NAME@next" --force
             npm publish --tag latest
           fi
