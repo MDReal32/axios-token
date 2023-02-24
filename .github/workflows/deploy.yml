@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           corepack enable
-          yarn install --immutable-cache
+          yarn install --immutable
           yarn build
 
       - name: Publish to npm with next tag
