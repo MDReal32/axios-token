@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           corepack enable
-          yarn install --frozen-lockfile
+          yarn install --immutable-cache
           yarn build
 
       - name: Publish to npm with next tag
@@ -32,8 +32,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            npm version prerelease --preid=next
-            npm publish --tag next
+            npm publish --access public --tag next
           elif [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/master" ]; then
             npm version patch
             npm publish --tag latest
