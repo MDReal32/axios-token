@@ -22,7 +22,10 @@ jobs:
           node-version: '14.x'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
+          yarn build
 
       - name: Publish to npm with next tag
         env:
