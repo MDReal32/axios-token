@@ -120,3 +120,5 @@ export const axiosToken = <
   axios: AxiosInstance,
   options?: AxiosTokenOptions<AT, RT, ATEI>
 ) => new AxiosToken(axios, options);
+
+export { CookieAdapter } from "./utils/cookie-adapter";
