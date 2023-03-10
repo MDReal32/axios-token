@@ -19,15 +19,13 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   getToken(): TokenResponse<AT, RT, ATEI> | null;
   getToken<Key extends AT | RT | ATEI>(key: Key): TokenResponse<AT, RT, ATEI>[Key] | null;
   getToken(key?: AT | RT | ATEI) {
-    if (typeof window !== "undefined") {
-      const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
-      if (key) {
-        if (key in token) return token[key];
-        throw new Error(`Token key ${key} not found`);
-      }
-      return token;
+    if (typeof window === "undefined") return this.token;
+    const token = JSON.parse(this.options.storage?.getItem(this.options.storageKey)) as TokenResponse<AT, RT, ATEI>;
+    if (key) {
+      if (token && key in token) return token[key];
+      return null;
     }
-    return this.token;
+    return token;
   }
 
   setToken(token: TokenResponse<AT, RT, ATEI>) {
@@ -94,9 +92,11 @@ class AxiosToken<AT extends string, RT extends string, ATEI extends string> {
   private async updateToken(error?: AxiosError) {
     const token = this.getToken();
     try {
-      const { data: newToken } = await this.axios.post<TokenResponse<AT, RT, ATEI>>(this.options.refreshTokenUrl, {
-        [this.options.refreshTokenKey]: token[this.options.refreshTokenKey],
-      });
+      const { data: newToken } = await this.axios.post<TokenResponse<AT, RT, ATEI>>(
+        this.options.refreshTokenUrl,
+        { [this.options.refreshTokenKey]: token[this.options.refreshTokenKey] },
+        { headers: { Authorization: `Bearer ${token[this.options.accessTokenKey]}` } }
+      );
       this.setToken(newToken);
       Object.assign(token, newToken);
       if (error) {
@@ -120,3 +120,5 @@ export const axiosToken = <
   axios: AxiosInstance,
   options?: AxiosTokenOptions<AT, RT, ATEI>
 ) => new AxiosToken(axios, options);
+
+export { CookieAdapter } from "./utils/cookie-adapter";
